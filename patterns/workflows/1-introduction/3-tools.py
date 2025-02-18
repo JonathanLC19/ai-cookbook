@@ -1,11 +1,21 @@
-import json
-import os
-
-import requests
-from openai import OpenAI
 from pydantic import BaseModel, Field
+# from openai import OpenAI
+from google import genai
+from google.genai import types
+import os
+from dotenv import load_dotenv
+from pprint import pprint
+import requests
+import json
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+load_dotenv()
+
+
+# client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+gemini_key = os.getenv("GEMINI_API_KEY")
+
+client = genai.Client(api_key=gemini_key)
 
 """
 docs: https://platform.openai.com/docs/guides/function-calling
@@ -53,7 +63,7 @@ system_prompt = "You are a helpful weather assistant."
 
 messages = [
     {"role": "system", "content": system_prompt},
-    {"role": "user", "content": "What's the weather like in Paris today?"},
+    {"role": "user", "content": "What's the weather like in Spain today?"},
 ]
 
 completion = client.chat.completions.create(
@@ -85,7 +95,8 @@ for tool_call in completion.choices[0].message.tool_calls:
 
     result = call_function(name, args)
     messages.append(
-        {"role": "tool", "tool_call_id": tool_call.id, "content": json.dumps(result)}
+        {"role": "tool", "tool_call_id": tool_call.id,
+            "content": json.dumps(result)}
     )
 
 # --------------------------------------------------------------
